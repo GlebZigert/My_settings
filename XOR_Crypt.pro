@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     group.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    my_settings.cpp
 
 HEADERS += \
     group.h \
-    mainwindow.h
+    mainwindow.h \
+    my_settings.h
 
 FORMS += \
     mainwindow.ui
