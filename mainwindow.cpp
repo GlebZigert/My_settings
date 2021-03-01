@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 //XOR_password();
 
 QMap<QString,MY_GROUP*> map=this->get_ini_qmap("D:/rifx.ini");
-QByteArray pwd=map.value("MYSQL")->map.value("Password");
+QByteArray pwd=map.value("MYSQL")->map.value("Password").second;
    qDebug()<<"Password" << QString::fromUtf8(pwd);
    QByteArray uncrypt;
    uncrypt.append(XOR_Crypt(pwd));
@@ -437,13 +437,14 @@ void MainWindow::find_password()
 
        //   MY_GROUP group[100];
           int cnt_group=0;
-
+          int field_group=0;
            foreach(QByteArray val,list)
            {
              //   qDebug()<< "ar "<<" "<<QString::fromUtf8(val)<<" "<<val.toHex();
                 //check for GROUP
                 if(((quint8)val[0]==91)&&((quint8)val[val.size()-1])==93)
                 {
+                    field_group=0;
 
                  qDebug()<<"----------------------------";
   /*                     foreach(QString key1, map.keys())
@@ -502,14 +503,15 @@ void MainWindow::find_password()
                //     qDebug()<< "val "<<" "<<QString::fromUtf8(src)<<" "<<src.toHex();
 
 
-                    map.value(str_group)->map.insert(QString::fromUtf8(key),src);
+                    map.value(str_group)->map.insert(QString::fromUtf8(key),qMakePair(field_group,src));
 
                             //..insert(QString::fromUtf8(key),src);
   /**/
                 }
+                field_group++;
            }
 
-           qDebug()<<"Password" << QString::fromUtf8(map.value("MYSQL")->map.value("Password"));
+           qDebug()<<"Password" << QString::fromUtf8(map.value("MYSQL")->map.value("Password").second);
   }
    //    file.close();
 
@@ -677,13 +679,14 @@ QMap<QString, MY_GROUP*> MainWindow::get_ini_qmap(QString filepath)
 
        //   MY_GROUP group[100];
           int cnt_group=0;
-
+          int field=0;
            foreach(QByteArray val,list)
            {
              //   qDebug()<< "ar "<<" "<<QString::fromUtf8(val)<<" "<<val.toHex();
                 //check for GROUP
                 if(((quint8)val[0]==91)&&((quint8)val[val.size()-1])==93)
                 {
+                    field=0;
 
                  qDebug()<<"----------------------------";
   /*                     foreach(QString key1, map.keys())
@@ -742,11 +745,12 @@ QMap<QString, MY_GROUP*> MainWindow::get_ini_qmap(QString filepath)
                //     qDebug()<< "val "<<" "<<QString::fromUtf8(src)<<" "<<src.toHex();
 
 
-                    map.value(str_group)->map.insert(QString::fromUtf8(key),src);
+                    map.value(str_group)->map.insert(QString::fromUtf8(key), qMakePair(field,src));
 
                             //..insert(QString::fromUtf8(key),src);
   /**/
                 }
+                field++;
            }
 
            //Cортировать по айдишнику MY_GROUP;
@@ -776,8 +780,19 @@ void MainWindow::save_ini(QMap<QString, MY_GROUP *> map, QString filepath)
       res.append(93);
       res.append(0x0D);
       res.append(0x0A);
+
+
+      stream->writeRawData(res,res.size());
+    };
+
+    auto write_empty_string = [](QDataStream* stream)
+    {
+      QByteArray res;
+
+      res.clear();
       res.append(0x0D);
       res.append(0x0A);
+
 
       stream->writeRawData(res,res.size());
     };
@@ -892,6 +907,9 @@ void MainWindow::save_ini(QMap<QString, MY_GROUP *> map, QString filepath)
 
     qDebug()<<"--------------------------------------------";
 
+
+
+
     /*
    QList<QString>::iterator i;
    for (i = list.begin(); i != list.end()-1; ++i)
@@ -928,13 +946,19 @@ void MainWindow::save_ini(QMap<QString, MY_GROUP *> map, QString filepath)
           write_group(&stream,map.key(list.at(i)));
 
           MY_GROUP* group=list.at(i);
-          foreach (QString key, group->map.keys()) {
+          group->sort();
+          for(int i=0;i<group->list.count();i++)
+          {
+              QString key=group->list.at(i);
+
+              //Sort
 
 
-          write_field(&stream,key,group->map.value(key));
+          write_field(&stream,key,group->map.value(key).second);
         //  stream.writeRawData(key.toLocal8Bit(),key.toLocal8Bit().size());
 
           }
+          write_empty_string(&stream);
 
 
        }

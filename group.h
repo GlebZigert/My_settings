@@ -11,7 +11,11 @@ class MY_GROUP : public QObject
 public:
     explicit MY_GROUP(QObject *parent = nullptr);
     int get_id();
-    QMap<QString,QByteArray> map;
+    QMap<QString,QPair<int,QByteArray>> map;
+
+    QList<QString> list;
+
+    void sort();
 
 
     bool operator<(const MY_GROUP other) const {
