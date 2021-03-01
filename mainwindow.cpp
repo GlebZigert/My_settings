@@ -554,7 +554,7 @@ QMap<QString, MY_GROUP*> MainWindow::get_ini_qmap(QString filepath)
                           stream >> data;
 //                          qDebug()<<(char)data<<" "<<data;
 
-                          if((data==32)||(data==13)||(data==10))
+                          if((data==13)||(data==10))
                               flag=1;
 
                          if(flag==0)
@@ -899,7 +899,7 @@ void MainWindow::save_ini(QMap<QString, MY_GROUP *> map, QString filepath)
     */
     qDebug()<<"-- После сортировки ------------------------";
 
-    for (int i = 0; i <list.count()-1; ++i)
+    for (int i = 0; i <list.count(); ++i)
     {
       qDebug()<<map.key(list.at(i))<<"  id= "<<list.at(i)->get_id();
 
@@ -941,7 +941,7 @@ void MainWindow::save_ini(QMap<QString, MY_GROUP *> map, QString filepath)
        QDataStream stream(&file);
 //       foreach(QString key,map.keys())
 
-       for (int i = 0; i <list.count()-1; ++i)
+       for (int i = 0; i <list.count(); ++i)
        {
           write_group(&stream,map.key(list.at(i)));
 
