@@ -806,15 +806,42 @@ void MainWindow::save_ini(QMap<QString, MY_GROUP *> map, QString filepath)
 
     qDebug()<<"-- До сортировки ------------------------";
     QList<MY_GROUP*>::iterator i;
+
+    int res=1;
+    int cnt=0;
+//    while(res==1)
+    while((res==1)&&(cnt<20))
+    {
+    res=0;
     for (i = list.begin(); i != list.end()-1; ++i)
     {
-      qDebug()<<map.key(*i)<<"  id= "<<(*i)->get_id();
+
+      if((*i)->get_id()<(*(i+1))->get_id())
+      {
+
+          qDebug()<<map.key(*i)<<" id "<<(*i)->get_id()<<" pos "<<list.count(*i)<<" меньше чем "<<map.key(*(i+1))<<" id "<<(*(i+1))->get_id()<<" pos "<<list.count((*i)+1);
+
+      }
+      else
+      {
+
+           qDebug()<<map.key(*i)<<" id "<<(*i)->get_id()<<" pos "<<list.count(*i)<<" больше чем "<<map.key(*(i+1))<<" id "<<(*(i+1))->get_id()<<" pos "<<list.count((*i)+1);
+           list.move(list.count((*i)+1),list.count(*i));
+
+           res=1;
+      }
+    //  qDebug()<<map.key(*i)<<"  id= "<<(*i)->get_id();
 
     }
+    qDebug()<<"-----------------cnt "<<cnt<<" res"<<res;
+    cnt++;
+    }
 
+    /*
     qSort(list.begin(), list.end(),
           [](const MY_GROUP* a, const MY_GROUP* b) -> bool
     { return &a < &b;});
+    */
     qDebug()<<"-- После сортировки ------------------------";
 
     for (i = list.begin(); i != list.end()-1; ++i)
